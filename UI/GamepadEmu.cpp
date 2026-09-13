@@ -1134,7 +1134,7 @@ GamepadEmuView::GamepadEmuView(const TouchControlConfig &config, float xres, flo
 								new UI::AnchorLayoutParams(togglePos.x * xres, togglePos.y * yres, NONE, NONE)
 									);
 
-										inGameSwapBtn->OnClick.Add([](UI::EventParams &) {
+										inGameSwapBtn->OnClick.Add([](UI::EventParams &e) -> UI::EventReturn {
 												SaveLayoutToSlot(g_activeLayoutSlot);
 														g_activeLayoutSlot ^= 1;
 																LoadLayoutFromSlot(g_activeLayoutSlot);
