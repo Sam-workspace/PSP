@@ -1,0 +1,49 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "9.6.0"
+
+      - name: Build APK
+        run: |
+          # Ensure git describe finds a valid tag for versionCode
+          git tag -f v1.17.0
+          
+          # Navigate to android folder and build optimized variant
+          cd android
+          gradle assembleNormalOptimized -PversionCode=1 -PversionName="1.0.0-custom"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ApexPSP-Optimized-APK
+          path: |
+            android/app/build/outputs/apk/**/*.apk
+            android/build/outputs/apk/**/*.apk
+            **/build/outputs/apk/**/*.apk
