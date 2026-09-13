@@ -34,6 +34,69 @@
 #include "Core/ControlMapper.h"
 #include "UI/GamepadEmu.h"
 
+#include "Common/File/FileUtil.h"
+#include "Common/File/Path.h"
+
+static const std::string layout2Filename = "controls_layout2.ini";
+static int g_activeLayoutSlot = 0; // 0 = Layout 1 (Default), 1 = Layout 2 (Custom/Driving)
+
+inline Path GetLayout2Path() {
+	return GetSysDirectory(DIRECTORY_SYSTEM) / layout2Filename;
+	}
+
+	inline void SaveLayoutToSlot(int slot) {
+		if (slot == 1) {
+				IniFile ini;
+						IniFile::Section *ctrl = ini.GetOrCreateSection("ControlCustom");
+								// Analog stick
+										ctrl->Set("AnalogStickX", g_Config.touchAnalogStick.x);
+												ctrl->Set("AnalogStickY", g_Config.touchAnalogStick.y);
+														ctrl->Set("AnalogStickScale", g_Config.touchAnalogStick.scale);
+																// D-Pad
+																		ctrl->Set("DpadX", g_Config.touchDpad.x);
+																				ctrl->Set("DpadY", g_Config.touchDpad.y);
+																						ctrl->Set("DpadScale", g_Config.touchDpad.scale);
+																								// Action buttons (Circle, Cross, Square, Triangle)
+																										ctrl->Set("ActionButtonX", g_Config.touchActionButtonCenter.x);
+																												ctrl->Set("ActionButtonY", g_Config.touchActionButtonCenter.y);
+																														ctrl->Set("ActionButtonScale", g_Config.touchActionButtonCenter.scale);
+																																// Shoulder buttons
+																																		ctrl->Set("LKeyX", g_Config.touchLKey.x);
+																																				ctrl->Set("LKeyY", g_Config.touchLKey.y);
+																																						ctrl->Set("RKeyX", g_Config.touchRKey.x);
+																																								ctrl->Set("RKeyY", g_Config.touchRKey.y);
+																																										ini.Save(GetLayout2Path());
+																																											} else {
+																																													g_Config.Save("SaveLayoutSlot0");
+																																														}
+																																														}
+
+																																														inline void LoadLayoutFromSlot(int slot) {
+																																															if (slot == 1) {
+																																																	IniFile ini;
+																																																			if (ini.Load(GetLayout2Path())) {
+																																																						IniFile::Section *ctrl = ini.GetOrCreateSection("ControlCustom");
+																																																									ctrl->Get("AnalogStickX", &g_Config.touchAnalogStick.x, g_Config.touchAnalogStick.x);
+																																																												ctrl->Get("AnalogStickY", &g_Config.touchAnalogStick.y, g_Config.touchAnalogStick.y);
+																																																															ctrl->Get("AnalogStickScale", &g_Config.touchAnalogStick.scale, g_Config.touchAnalogStick.scale);
+
+																																																																		ctrl->Get("DpadX", &g_Config.touchDpad.x, g_Config.touchDpad.x);
+																																																																					ctrl->Get("DpadY", &g_Config.touchDpad.y, g_Config.touchDpad.y);
+																																																																								ctrl->Get("DpadScale", &g_Config.touchDpad.scale, g_Config.touchDpad.scale);
+
+																																																																											ctrl->Get("ActionButtonX", &g_Config.touchActionButtonCenter.x, g_Config.touchActionButtonCenter.x);
+																																																																														ctrl->Get("ActionButtonY", &g_Config.touchActionButtonCenter.y, g_Config.touchActionButtonCenter.y);
+																																																																																	ctrl->Get("ActionButtonScale", &g_Config.touchActionButtonCenter.scale, g_Config.touchActionButtonCenter.scale);
+
+																																																																																				ctrl->Get("LKeyX", &g_Config.touchLKey.x, g_Config.touchLKey.x);
+																																																																																							ctrl->Get("LKeyY", &g_Config.touchLKey.y, g_Config.touchLKey.y);
+																																																																																										ctrl->Get("RKeyX", &g_Config.touchRKey.x, g_Config.touchRKey.x);
+																																																																																													ctrl->Get("RKeyY", &g_Config.touchRKey.y, g_Config.touchRKey.y);
+																																																																																															}
+																																																																																																} else {
+																																																																																																		g_Config.Load();
+																																																																																																			}
+																																																																																																			}
 const float TOUCH_SCALE_FACTOR = 1.5f;
 
 static uint32_t usedPointerMask = 0;
@@ -1061,6 +1124,25 @@ GamepadEmuView::GamepadEmuView(const TouchControlConfig &config, float xres, flo
 			button->SetMinimumAlpha(0.1f);
 		}
 	}
+
+	// Layout Swap Button (L1 <-> L2)
+		ConfigTouchPos togglePos = config.touchPauseKey;
+			togglePos.x += 0.12f;
+
+				UI::Button *inGameSwapBtn = new UI::Button(
+						g_activeLayoutSlot == 0 ? "L1" : "L2",
+								new UI::AnchorLayoutParams(togglePos.x * xres, togglePos.y * yres, NONE, NONE)
+									);
+
+										inGameSwapBtn->OnClick.Add([](UI::EventParams &) {
+												SaveLayoutToSlot(g_activeLayoutSlot);
+														g_activeLayoutSlot ^= 1;
+																LoadLayoutFromSlot(g_activeLayoutSlot);
+																		System_PostUIMessage(UIMessage::RECREATE_VIEWS);
+																				return UI::EVENT_DONE;
+																					});
+
+																						Add(inGameSwapBtn);
 
 	// touchActionButtonCenter.show will always be true, since that's the default.
 	if (config.bShowTouchCircle)

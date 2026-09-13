@@ -36,6 +36,10 @@
 #include "UI/TouchControlLayoutScreen.h"
 #include "UI/TouchControlVisibilityScreen.h"
 
+extern void SaveLayoutToSlot(int slot);
+extern void LoadLayoutFromSlot(int slot);
+extern int g_activeLayoutSlot;
+
 static float layoutAreaScale = 1.0f;
 
 static u32 GetButtonColor() {
@@ -660,6 +664,14 @@ void TouchControlLayoutScreen::CreateViews() {
 	});
 	leftColumn->Add(snap);
 	leftColumn->Add(gridSize);
+	std::string slotLabel = (g_activeLayoutSlot == 0) ? "Slot: 1" : "Slot: 2";
+		leftColumn->Add(new Choice(slotLabel))->OnClick.Add([this](UI::EventParams &) {
+				SaveLayoutToSlot(g_activeLayoutSlot);
+						g_activeLayoutSlot ^= 1;
+								LoadLayoutFromSlot(g_activeLayoutSlot);
+										RecreateViews();
+												return UI::EVENT_DONE;
+													});
 	leftColumn->Add(new Choice(di->T("Reset")))->OnClick.Handle(this, &TouchControlLayoutScreen::OnReset);
 	leftColumn->Add(new Spacer(12.0f));
 	leftColumn->Add(new Choice(di->T("Back"), ImageID("I_NAVIGATE_BACK")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
