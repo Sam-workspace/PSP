@@ -34,6 +34,7 @@
 #include "Core/ControlMapper.h"
 #include "UI/GamepadEmu.h"
 
+#include "Common/Data/Format/IniFile.h"
 #include "Common/File/FileUtil.h"
 #include "Common/File/Path.h"
 
