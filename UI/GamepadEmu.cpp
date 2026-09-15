@@ -1127,23 +1127,23 @@ GamepadEmuView::GamepadEmuView(const TouchControlConfig &config, float xres, flo
 	}
 
 	// Layout Swap Button (L1 <-> L2)
-		ConfigTouchPos togglePos = config.touchPauseKey;
-			togglePos.x += 0.12f;
+	ConfigTouchPos togglePos = config.touchPauseKey;
+	togglePos.x += 0.12f; // Offset to sit right next to the pause button
 
-				UI::Button *inGameSwapBtn = new UI::Button(
-						g_activeLayoutSlot == 0 ? "L1" : "L2",
-								new UI::AnchorLayoutParams(togglePos.x * xres, togglePos.y * yres, NONE, NONE)
-									);
+	std::string btnText = (g_activeLayoutSlot == 0) ? "L1" : "L2";
+	UI::Button *inGameSwapBtn = new UI::Button(
+		btnText,
+		new UI::AnchorLayoutParams(togglePos.x * xres, togglePos.y * yres, NONE, NONE)
+	);
 
-										inGameSwapBtn->OnClick.Add([](UI::EventParams &e) -> UI::EventReturn {
-												SaveLayoutToSlot(g_activeLayoutSlot);
-														g_activeLayoutSlot ^= 1;
-																LoadLayoutFromSlot(g_activeLayoutSlot);
-																		System_PostUIMessage(UIMessage::RECREATE_VIEWS);
-																				return UI::EVENT_DONE;
-																					});
+	inGameSwapBtn->OnClick.Add([](UI::EventParams &e) {
+		SaveLayoutToSlot(g_activeLayoutSlot);
+		g_activeLayoutSlot ^= 1; // Toggle slot 0 <-> 1
+		LoadLayoutFromSlot(g_activeLayoutSlot);
+		System_PostUIMessage(UIMessage::RECREATE_VIEWS);
+	});
 
-																						Add(inGameSwapBtn);
+	Add(inGameSwapBtn);
 
 	// touchActionButtonCenter.show will always be true, since that's the default.
 	if (config.bShowTouchCircle)
