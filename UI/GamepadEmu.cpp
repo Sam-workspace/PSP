@@ -45,7 +45,7 @@ void SaveLayoutToSlot(int slot) {
 	if (slot == 1) {
 		IniFile ini;
 		auto *ctrl = ini.GetOrCreateSection("ControlCustom");
-		auto &cfg = g_Config.touchControlConfigs[0];
+		auto &cfg = g_Config.GetTouchControlsConfig(GetDeviceOrientation());
 
 		// Analog Stick
 		ctrl->Set("AnalogStickX", cfg.touchAnalogStick.x);
@@ -79,7 +79,7 @@ void LoadLayoutFromSlot(int slot) {
 		IniFile ini;
 		if (ini.Load(GetSysDirectory(DIRECTORY_SYSTEM) / "controls_layout2.ini")) {
 			auto *ctrl = ini.GetOrCreateSection("ControlCustom");
-			auto &cfg = g_Config.touchControlConfigs[0];
+			auto &cfg = g_Config.GetTouchControlsConfig(GetDeviceOrientation());
 
 			// Analog Stick
 			ctrl->Get("AnalogStickX", &cfg.touchAnalogStick.x, cfg.touchAnalogStick.x);
