@@ -81,26 +81,26 @@ void LoadLayoutFromSlot(int slot) {
 			auto *ctrl = ini.GetOrCreateSection("ControlCustom");
 			auto &cfg = g_Config.GetTouchControlsConfig(DeviceOrientation::Landscape);
 
-			// Analog Stick
-			ctrl->Get("AnalogStickX", &cfg.touchAnalogStick.x, cfg.touchAnalogStick.x);
-			ctrl->Get("AnalogStickY", &cfg.touchAnalogStick.y, cfg.touchAnalogStick.y);
-			ctrl->Get("AnalogStickScale", &cfg.touchAnalogStick.scale, cfg.touchAnalogStick.scale);
+			// Analog Stick (2 arguments only)
+			ctrl->Get("AnalogStickX", &cfg.touchAnalogStick.x);
+			ctrl->Get("AnalogStickY", &cfg.touchAnalogStick.y);
+			ctrl->Get("AnalogStickScale", &cfg.touchAnalogStick.scale);
 
 			// D-Pad
-			ctrl->Get("DpadX", &cfg.touchDpad.x, cfg.touchDpad.x);
-			ctrl->Get("DpadY", &cfg.touchDpad.y, cfg.touchDpad.y);
-			ctrl->Get("DpadScale", &cfg.touchDpad.scale, cfg.touchDpad.scale);
+			ctrl->Get("DpadX", &cfg.touchDpad.x);
+			ctrl->Get("DpadY", &cfg.touchDpad.y);
+			ctrl->Get("DpadScale", &cfg.touchDpad.scale);
 
 			// Action Buttons
-			ctrl->Get("ActionButtonX", &cfg.touchActionButtonCenter.x, cfg.touchActionButtonCenter.x);
-			ctrl->Get("ActionButtonY", &cfg.touchActionButtonCenter.y, cfg.touchActionButtonCenter.y);
-			ctrl->Get("ActionButtonScale", &cfg.touchActionButtonCenter.scale, cfg.touchActionButtonCenter.scale);
+			ctrl->Get("ActionButtonX", &cfg.touchActionButtonCenter.x);
+			ctrl->Get("ActionButtonY", &cfg.touchActionButtonCenter.y);
+			ctrl->Get("ActionButtonScale", &cfg.touchActionButtonCenter.scale);
 
 			// Shoulder Buttons
-			ctrl->Get("LKeyX", &cfg.touchLKey.x, cfg.touchLKey.x);
-			ctrl->Get("LKeyY", &cfg.touchLKey.y, cfg.touchLKey.y);
-			ctrl->Get("RKeyX", &cfg.touchRKey.x, cfg.touchRKey.x);
-			ctrl->Get("RKeyY", &cfg.touchRKey.y, cfg.touchRKey.y);
+			ctrl->Get("LKeyX", &cfg.touchLKey.x);
+			ctrl->Get("LKeyY", &cfg.touchLKey.y);
+			ctrl->Get("RKeyX", &cfg.touchRKey.x);
+			ctrl->Get("RKeyY", &cfg.touchRKey.y);
 		}
 	} else {
 		g_Config.Load();
