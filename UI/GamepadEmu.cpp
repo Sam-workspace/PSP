@@ -39,65 +39,73 @@
 #include "Common/File/Path.h"
 
 static const std::string layout2Filename = "controls_layout2.ini";
-static int g_activeLayoutSlot = 0; // 0 = Layout 1 (Default), 1 = Layout 2 (Custom/Driving)
+int g_activeLayoutSlot = 0;
 
-inline Path GetLayout2Path() {
-	return GetSysDirectory(DIRECTORY_SYSTEM) / layout2Filename;
+void SaveLayoutToSlot(int slot) {
+	if (slot == 1) {
+		IniFile ini;
+		auto *ctrl = ini.GetOrCreateSection("ControlCustom");
+		auto &cfg = g_Config.touchControlConfigs[0];
+
+		// Analog Stick
+		ctrl->Set("AnalogStickX", cfg.touchAnalogStick.x);
+		ctrl->Set("AnalogStickY", cfg.touchAnalogStick.y);
+		ctrl->Set("AnalogStickScale", cfg.touchAnalogStick.scale);
+
+		// D-Pad
+		ctrl->Set("DpadX", cfg.touchDpad.x);
+		ctrl->Set("DpadY", cfg.touchDpad.y);
+		ctrl->Set("DpadScale", cfg.touchDpad.scale);
+
+		// Action Buttons
+		ctrl->Set("ActionButtonX", cfg.touchActionButtonCenter.x);
+		ctrl->Set("ActionButtonY", cfg.touchActionButtonCenter.y);
+		ctrl->Set("ActionButtonScale", cfg.touchActionButtonCenter.scale);
+
+		// Shoulder Buttons
+		ctrl->Set("LKeyX", cfg.touchLKey.x);
+		ctrl->Set("LKeyY", cfg.touchLKey.y);
+		ctrl->Set("RKeyX", cfg.touchRKey.x);
+		ctrl->Set("RKeyY", cfg.touchRKey.y);
+
+		ini.Save(GetSysDirectory(DIRECTORY_SYSTEM) / "controls_layout2.ini");
+	} else {
+		g_Config.Save("SaveLayoutSlot0");
 	}
+}
 
-	inline void SaveLayoutToSlot(int slot) {
-		if (slot == 1) {
-				IniFile ini;
-						IniFile::Section *ctrl = ini.GetOrCreateSection("ControlCustom");
-								// Analog stick
-										ctrl->Set("AnalogStickX", g_Config.touchAnalogStick.x);
-												ctrl->Set("AnalogStickY", g_Config.touchAnalogStick.y);
-														ctrl->Set("AnalogStickScale", g_Config.touchAnalogStick.scale);
-																// D-Pad
-																		ctrl->Set("DpadX", g_Config.touchDpad.x);
-																				ctrl->Set("DpadY", g_Config.touchDpad.y);
-																						ctrl->Set("DpadScale", g_Config.touchDpad.scale);
-																								// Action buttons (Circle, Cross, Square, Triangle)
-																										ctrl->Set("ActionButtonX", g_Config.touchActionButtonCenter.x);
-																												ctrl->Set("ActionButtonY", g_Config.touchActionButtonCenter.y);
-																														ctrl->Set("ActionButtonScale", g_Config.touchActionButtonCenter.scale);
-																																// Shoulder buttons
-																																		ctrl->Set("LKeyX", g_Config.touchLKey.x);
-																																				ctrl->Set("LKeyY", g_Config.touchLKey.y);
-																																						ctrl->Set("RKeyX", g_Config.touchRKey.x);
-																																								ctrl->Set("RKeyY", g_Config.touchRKey.y);
-																																										ini.Save(GetLayout2Path());
-																																											} else {
-																																													g_Config.Save("SaveLayoutSlot0");
-																																														}
-																																														}
+void LoadLayoutFromSlot(int slot) {
+	if (slot == 1) {
+		IniFile ini;
+		if (ini.Load(GetSysDirectory(DIRECTORY_SYSTEM) / "controls_layout2.ini")) {
+			auto *ctrl = ini.GetOrCreateSection("ControlCustom");
+			auto &cfg = g_Config.touchControlConfigs[0];
 
-																																														inline void LoadLayoutFromSlot(int slot) {
-																																															if (slot == 1) {
-																																																	IniFile ini;
-																																																			if (ini.Load(GetLayout2Path())) {
-																																																						IniFile::Section *ctrl = ini.GetOrCreateSection("ControlCustom");
-																																																									ctrl->Get("AnalogStickX", &g_Config.touchAnalogStick.x, g_Config.touchAnalogStick.x);
-																																																												ctrl->Get("AnalogStickY", &g_Config.touchAnalogStick.y, g_Config.touchAnalogStick.y);
-																																																															ctrl->Get("AnalogStickScale", &g_Config.touchAnalogStick.scale, g_Config.touchAnalogStick.scale);
+			// Analog Stick
+			ctrl->Get("AnalogStickX", &cfg.touchAnalogStick.x, cfg.touchAnalogStick.x);
+			ctrl->Get("AnalogStickY", &cfg.touchAnalogStick.y, cfg.touchAnalogStick.y);
+			ctrl->Get("AnalogStickScale", &cfg.touchAnalogStick.scale, cfg.touchAnalogStick.scale);
 
-																																																																		ctrl->Get("DpadX", &g_Config.touchDpad.x, g_Config.touchDpad.x);
-																																																																					ctrl->Get("DpadY", &g_Config.touchDpad.y, g_Config.touchDpad.y);
-																																																																								ctrl->Get("DpadScale", &g_Config.touchDpad.scale, g_Config.touchDpad.scale);
+			// D-Pad
+			ctrl->Get("DpadX", &cfg.touchDpad.x, cfg.touchDpad.x);
+			ctrl->Get("DpadY", &cfg.touchDpad.y, cfg.touchDpad.y);
+			ctrl->Get("DpadScale", &cfg.touchDpad.scale, cfg.touchDpad.scale);
 
-																																																																											ctrl->Get("ActionButtonX", &g_Config.touchActionButtonCenter.x, g_Config.touchActionButtonCenter.x);
-																																																																														ctrl->Get("ActionButtonY", &g_Config.touchActionButtonCenter.y, g_Config.touchActionButtonCenter.y);
-																																																																																	ctrl->Get("ActionButtonScale", &g_Config.touchActionButtonCenter.scale, g_Config.touchActionButtonCenter.scale);
+			// Action Buttons
+			ctrl->Get("ActionButtonX", &cfg.touchActionButtonCenter.x, cfg.touchActionButtonCenter.x);
+			ctrl->Get("ActionButtonY", &cfg.touchActionButtonCenter.y, cfg.touchActionButtonCenter.y);
+			ctrl->Get("ActionButtonScale", &cfg.touchActionButtonCenter.scale, cfg.touchActionButtonCenter.scale);
 
-																																																																																				ctrl->Get("LKeyX", &g_Config.touchLKey.x, g_Config.touchLKey.x);
-																																																																																							ctrl->Get("LKeyY", &g_Config.touchLKey.y, g_Config.touchLKey.y);
-																																																																																										ctrl->Get("RKeyX", &g_Config.touchRKey.x, g_Config.touchRKey.x);
-																																																																																													ctrl->Get("RKeyY", &g_Config.touchRKey.y, g_Config.touchRKey.y);
-																																																																																															}
-																																																																																																} else {
-																																																																																																		g_Config.Load();
-																																																																																																			}
-																																																																																																			}
+			// Shoulder Buttons
+			ctrl->Get("LKeyX", &cfg.touchLKey.x, cfg.touchLKey.x);
+			ctrl->Get("LKeyY", &cfg.touchLKey.y, cfg.touchLKey.y);
+			ctrl->Get("RKeyX", &cfg.touchRKey.x, cfg.touchRKey.x);
+			ctrl->Get("RKeyY", &cfg.touchRKey.y, cfg.touchRKey.y);
+		}
+	} else {
+		g_Config.Load();
+	}
+}
 const float TOUCH_SCALE_FACTOR = 1.5f;
 
 static uint32_t usedPointerMask = 0;
